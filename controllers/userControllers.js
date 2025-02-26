@@ -6,14 +6,29 @@ export async function postUser(req, res) {
   try {
     const user = req.body;
 
+    console.log(user);
+
+    const checkUser = await User.findOne({ email: user.email });
+
+    console.log("checkuser", checkUser);
+
+    if (checkUser) {
+      res.status(400).json({
+        message: "Already using this email",
+      });
+
+      return;
+    }
+
     const newUser = new User(user);
+
     newUser.save();
 
-    res.json({
+    res.status(201).json({
       message: " User Creation Succesfully",
     });
   } catch (error) {
-    res.json({
+    res.status(500).json({
       message: "user Creation Unsuccessfull !",
       error: error.message,
     });
@@ -28,4 +43,34 @@ export function getUser(req, res) {
       list: userList,
     });
   });
+}
+
+export async function loginUser(req, res) {
+  try {
+    const credintials = req.body;
+
+    const user = await User.findOne({
+      email: credintials.email,
+      password: credintials.password,
+    });
+    if (!user) {
+      return res.status(403).json({
+        message: "User not found",
+      });
+    } else {
+      res.json({
+        message: "User find successfully",
+        userData: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      });
+    }
+  } catch (error) {
+    res.json({
+      message:
+        "Something went wrong while login the user. Please try again later.",
+      error: error.message,
+    });
+  }
 }
