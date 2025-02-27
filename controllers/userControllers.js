@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
-
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import argon2 from "argon2";
+
 export async function postUser(req, res) {
   try {
     const user = req.body;
@@ -19,6 +19,12 @@ export async function postUser(req, res) {
 
       return;
     }
+
+    //hash user password
+
+    const hashPassword = await argon2.hash(user.password);
+
+    user.password = hashPassword;
 
     const newUser = new User(user);
 
@@ -47,12 +53,17 @@ export function getUser(req, res) {
 
 export async function loginUser(req, res) {
   try {
-    const credintials = req.body;
+    const credentials = req.body;
 
     const user = await User.findOne({
-      email: credintials.email,
-      password: credintials.password,
+      email: credentials.email,
     });
+
+    if (!user) {
+      return res.status(403).json({
+        message: "User not found",
+      });
+    }
 
     if (user.disabled) {
       return res.status(403).json({
@@ -60,36 +71,37 @@ export async function loginUser(req, res) {
       });
     }
 
-    if (!user) {
-      return res.status(403).json({
-        message: "User not found",
-      });
+    // Verify the password using argon2
+    const isMatch = await argon2.verify(user.password, credentials.password);
+    if (!isMatch) {
+      return res.status(403).json({ message: "Invalid email or password" });
     } else {
       const payload = {
         id: user._id,
         email: user.email,
         firstName: user.firstName,
-        lastname: user.lastName,
+        lastName: user.lastName,
         type: user.type,
       };
-      const token = jwt.sign(payload, "secret", { expiresIn: "1h" });
+
+      // Create a JWT token
+      const token = jwt.sign(payload, "secret");
 
       res.json({
-        message: "login successfully",
-        // userData: {
-
-        //   firstName: user.firstName,
-        //   lastName: user.lastName,
-        // },
-
-        user: user,
+        message: "Login successfully",
+        user: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          type: user.type,
+        },
         token: token,
       });
     }
   } catch (error) {
     res.status(500).json({
-      message:
-        "Something went wrong while login the user. Please try again later.",
+      message: "Something went wrong while logging in. Please try again later.",
       error: error.message,
     });
   }
