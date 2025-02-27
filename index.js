@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import userRouter from "./routes/userRoute.js";
 import mongoose from "mongoose";
 import galleryItemRouter from "./routes/galleryItemRoute.js";
+import jwt, { decode } from "jsonwebtoken";
 
 const app = express();
 
@@ -11,6 +12,23 @@ app.use(bodyParser.json());
 
 const CONNCETION_URL =
   "mongodb+srv://dilantha:95909982@cluster0.oepqc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+app.use((req, res, next) => {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (token != null) {
+    jwt.verify(token, "secret", (err, decoded) => {
+      if (decoded != null) {
+        req.user = decoded;
+        console.log(decoded);
+
+        next();
+      }
+    });
+  } else {
+    next();
+  }
+});
 
 mongoose
   .connect(CONNCETION_URL)
