@@ -94,3 +94,27 @@ export async function loginUser(req, res) {
     });
   }
 }
+
+export function checkIsAdmin(req) {
+  if (!req.user) {
+    return false;
+  }
+
+  if (req.user.type != "admin") {
+    return false;
+  }
+
+  return true;
+}
+
+export function checkIsCustomer(req) {
+  if (!req.user) {
+    return false;
+  }
+
+  if (req.user.type != "customer") {
+    return false;
+  }
+
+  return true;
+}
