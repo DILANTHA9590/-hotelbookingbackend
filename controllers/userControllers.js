@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import User from "../models/user.js";
-
+import jwt from "jsonwebtoken";
 export async function postUser(req, res) {
   try {
     const user = req.body;
@@ -53,21 +53,41 @@ export async function loginUser(req, res) {
       email: credintials.email,
       password: credintials.password,
     });
+
+    if (user.disabled) {
+      return res.status(403).json({
+        message: "Your account has been suspended. Please contact the admin.",
+      });
+    }
+
     if (!user) {
       return res.status(403).json({
         message: "User not found",
       });
     } else {
+      const payload = {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastname: user.lastName,
+        type: user.type,
+      };
+      const token = jwt.sign(payload, "secret", { expiresIn: "1h" });
+
       res.json({
-        message: "User find successfully",
-        userData: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
+        message: "login successfully",
+        // userData: {
+
+        //   firstName: user.firstName,
+        //   lastName: user.lastName,
+        // },
+
+        user: user,
+        token: token,
       });
     }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       message:
         "Something went wrong while login the user. Please try again later.",
       error: error.message,
