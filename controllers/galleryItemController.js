@@ -1,9 +1,19 @@
 import GalleryItem from "../models/galleryItems.js";
+import { checkIsAdmin } from "./userControllers.js";
 
 // create galle6y item
 
 export async function postGalleryItems(req, res) {
   try {
+    const user = req.user;
+
+    if (!checkIsAdmin(req)) {
+      res.status(403).json({
+        message: "Unautherized Access. Please Login to admin account",
+      });
+      return;
+    }
+
     const newGalleryItem = new GalleryItem(req.body);
     await newGalleryItem.save();
 
@@ -19,6 +29,7 @@ export async function postGalleryItems(req, res) {
 }
 
 export async function getImageGallery(req, res) {
+  console.log(req.header);
   try {
     const galleryList = await GalleryItem.find();
 
@@ -31,5 +42,4 @@ export async function getImageGallery(req, res) {
       error: error.message,
     });
   }
-  s;
 }
