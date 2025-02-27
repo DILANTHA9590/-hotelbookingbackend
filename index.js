@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import userRouter from "./routes/userRoute.js";
 import mongoose from "mongoose";
 import galleryItemRouter from "./routes/galleryItemRoute.js";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
@@ -16,16 +16,19 @@ const CONNCETION_URL =
 app.use((req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
-  if (token != null) {
-    jwt.verify(token, "secret", (err, decoded) => {
-      if (decoded != null) {
-        req.user = decoded;
-        console.log(decoded);
-
-        next();
+  if (token) {
+    jwt.verify(token, "secret", (error, decoded) => {
+      if (error) {
+        // If token is invalid, send a 401 Unauthorized response
+        return res.status(401).json({ message: "Unauthorized" });
       }
+
+      // If token is valid, attach decoded data to req.user
+      req.user = decoded;
+      next(); // Continue to the next middleware/route handler
     });
   } else {
+    // No token is present, just continue to the next middleware/route handler
     next();
   }
 });
