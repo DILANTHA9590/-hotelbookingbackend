@@ -6,6 +6,7 @@ import galleryItemRouter from "./routes/galleryItemRoute.js";
 import jwt from "jsonwebtoken";
 import categoryRouter from "./routes/categoryRouter.js";
 import dotenv from "dotenv";
+import roomRouter from "./routes/roomsRouter.js";
 dotenv.config();
 
 const app = express();
@@ -51,6 +52,8 @@ app.use("/api/users", userRouter);
 app.use("/api/gallery", galleryItemRouter);
 
 app.use("/api/catagories", categoryRouter);
+
+app.use("/api/rooms", roomRouter);
 
 // A simple route for the homepage
 
