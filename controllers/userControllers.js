@@ -1,7 +1,9 @@
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
+import dotenv from "dotenv";
 
+dotenv.config();
 export async function postUser(req, res) {
   try {
     const user = req.body;
@@ -85,7 +87,7 @@ export async function loginUser(req, res) {
       };
 
       // Create a JWT token
-      const token = jwt.sign(payload, "secret");
+      const token = jwt.sign(payload, process.env.SECRET_KEY);
 
       res.json({
         message: "Login successfully",
