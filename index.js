@@ -4,6 +4,7 @@ import userRouter from "./routes/userRoute.js";
 import mongoose from "mongoose";
 import galleryItemRouter from "./routes/galleryItemRoute.js";
 import jwt from "jsonwebtoken";
+import categoryRouter from "./routes/categoryRouter.js";
 
 const app = express();
 
@@ -24,7 +25,9 @@ app.use((req, res, next) => {
       }
 
       // If token is valid, attach decoded data to req.user
+
       req.user = decoded;
+
       next(); // Continue to the next middleware/route handler
     });
   } else {
@@ -45,6 +48,8 @@ mongoose
 app.use("/api/users", userRouter);
 
 app.use("/api/gallery", galleryItemRouter);
+
+app.use("/api/catagories", categoryRouter);
 
 // A simple route for the homepage
 
