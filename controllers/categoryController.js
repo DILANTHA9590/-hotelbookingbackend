@@ -49,13 +49,45 @@ export async function deleteCategory(req, res) {
       message: " Category item Delete successfully",
     });
   } catch (error) {
-    res.json({
+    res.status(500).json({
       message: "Something went a wrong Please try again",
       error: error.message,
     });
   }
 }
 
-// export async function updateCategory(req,res){
+export async function getCategoryItems(req, res) {
+  try {
+    const categoryItems = await CategoryItem.find();
 
-// }
+    res.status(200).json({
+      message: categoryItems,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+      error: error.message,
+    });
+  }
+}
+
+export async function getCategoryName(req, res) {
+  try {
+    const findCategory = await CategoryItem.findOne({ name: req.params.name });
+
+    if (!findCategory) {
+      return res.status(404).json({
+        message: "Category not found",
+      });
+    }
+
+    res.status(200).json({
+      message: findCategory,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "something wenet a wrong",
+      message: error.message,
+    });
+  }
+}
