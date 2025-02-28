@@ -91,3 +91,33 @@ export async function getCategoryName(req, res) {
     });
   }
 }
+
+export async function updateCategory(req, res) {
+  try {
+    if (!checkIsAdmin(req)) {
+      return res.status(403).json({
+        message: " Unautherized Access, Please Login Admin Account ",
+      });
+    }
+
+    const findCategory = await CategoryItem.findOne({ name: req.params.name });
+
+    if (!findCategory) {
+      return res.status(404).json({
+        message: "Category not found!",
+      });
+    }
+
+    const updateData = req.body;
+    await CategoryItem.updateOne({ name: req.params.name }, updateData);
+
+    res.status(200).json({
+      message: "Category Item Updated Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: " Some thing went a wrong please try again!",
+      error: error.message,
+    });
+  }
+}
