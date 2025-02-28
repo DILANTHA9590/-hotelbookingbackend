@@ -5,8 +5,6 @@ import { checkIsAdmin } from "./userControllers.js";
 
 export async function postGalleryItems(req, res) {
   try {
-    const user = req.user;
-
     if (!checkIsAdmin(req)) {
       res.status(403).json({
         message: "Unautherized Access. Please Login to admin account",
