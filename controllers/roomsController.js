@@ -68,7 +68,7 @@ export async function updateRoomDetails(req, res) {
 
 export async function getRooms(req, res) {
   try {
-    const roomList = await Room.finnd();
+    const roomList = await Room.find();
 
     res.status(200).json({
       message: "Data retrieved successfully.",
@@ -77,7 +77,38 @@ export async function getRooms(req, res) {
   } catch (error) {
     res.status(500).json({
       message: " Something went a wrong please try again",
-      error: message.error,
+      error: error.message,
+    });
+  }
+}
+
+export async function deleteRoom(req, res) {
+  try {
+    if (!checkIsAdmin) {
+      return res.status(403).json({
+        message: "  Unautherized Access, Please Login Admin Account",
+      });
+    }
+
+    const roomId = req.params.roomId;
+    console.log("params inside id", roomId);
+    const checkIsHave = await Room.findOne({ roomId: roomId });
+
+    if (!checkIsHave) {
+      return res.status(404).json({
+        message: "Room is not found",
+      });
+    }
+
+    await Room.deleteOne({ roomId: roomId });
+
+    res.status(200).json({
+      message: "Room Deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again later",
+      error: error.message,
     });
   }
 }
