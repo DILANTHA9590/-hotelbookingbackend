@@ -112,26 +112,3 @@ export async function deleteRoom(req, res) {
     });
   }
 }
-
-export async function getRoomByCategory(req, res) {
-  try {
-    const category = req.params.category;
-
-    const roomList = await Room.find({ category: category });
-
-    if (roomList.length <= 0) {
-      return res.status(404).json({
-        message: `${category} category not found`,
-      });
-    }
-    res.status(200).json({
-      message: category + " category retrieved successfully.",
-      categoryRooms: roomList,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: " Something went a wrong please try again",
-      error: error.message,
-    });
-  }
-}
