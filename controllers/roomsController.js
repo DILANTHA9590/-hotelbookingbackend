@@ -33,3 +33,35 @@ export async function createRoom(req, res) {
     });
   }
 }
+
+export async function updateRoomDetails(req, res) {
+  try {
+    if (!checkIsAdmin(req)) {
+      return res.status(403).json({
+        message: "  Unautherized Access, Please Login Admin Account",
+      });
+    }
+
+    const updateRoomId = req.params.roomId;
+    const updateRoomData = req.body;
+
+    const room = await Room.findOne({ roomId: updateRoomId });
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    console.log("insideparams roomId", updateRoomId);
+    console.log("inside room update data", updateRoomData);
+
+    await Room.updateOne({ roomId: updateRoomId }, updateRoomData);
+
+    res.status(200).json({
+      message: " Room updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: " Something went a wrong please try again",
+      error: error.message,
+    });
+  }
+}
