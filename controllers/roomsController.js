@@ -65,3 +65,19 @@ export async function updateRoomDetails(req, res) {
     });
   }
 }
+
+export async function getRooms(req, res) {
+  try {
+    const roomList = await Room.finnd();
+
+    res.status(200).json({
+      message: "Data retrieved successfully.",
+      rooms: roomList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: " Something went a wrong please try again",
+      error: message.error,
+    });
+  }
+}
