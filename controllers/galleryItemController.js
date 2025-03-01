@@ -32,7 +32,7 @@ export async function getImageGallery(req, res) {
     const galleryList = await GalleryItem.find();
 
     res.status(200).json({
-      galleryList,
+      gallery: galleryList,
     });
   } catch (error) {
     res.json({
