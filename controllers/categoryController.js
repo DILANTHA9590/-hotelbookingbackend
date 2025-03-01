@@ -61,7 +61,8 @@ export async function getCategoryItems(req, res) {
     const categoryItems = await CategoryItem.find();
 
     res.status(200).json({
-      message: categoryItems,
+      message: "Data retrieved successfully.",
+      categories: categoryItems,
     });
   } catch (error) {
     res.status(500).json({
@@ -82,7 +83,7 @@ export async function getCategoryName(req, res) {
     }
 
     res.status(200).json({
-      message: findCategory,
+      category: findCategory,
     });
   } catch (error) {
     res.status(500).json({
