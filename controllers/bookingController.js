@@ -1,0 +1,93 @@
+import Booking from "../models/booking.js";
+import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
+
+export async function createBooking(req, res) {
+  try {
+    if (!checkIsCustomer(req)) {
+      return res.status(403).json({
+        message: "Please log in to Customer continue with your booking.",
+      });
+    }
+
+    const orderCount = await Booking.countDocuments({}).exec();
+    console.log(orderCount);
+    const prefix = "INV";
+    let orderId;
+
+    if (orderCount === 0) {
+      orderId = prefix + 1001;
+    } else {
+      orderId = prefix + (1001 + orderCount);
+    }
+    // const email = req.user.email;
+
+    // const bookingData = req.body;
+    // bookingData.bookingId = orderId;
+
+    // bookingData.email = email;
+
+    const bookingData = {
+      ...req.body,
+      bookingId: orderId,
+      email: req.user.email,
+    };
+
+    const newBooking = new Booking(bookingData);
+
+    await newBooking.save();
+
+    res.status(200).json({
+      message: "Booking created succesfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+      error: error.message,
+    });
+  }
+}
+
+//this not good⛔⛔⛔⛔⛔⛔⛔⛔⛔
+//methana e userge email eka ganna haduve na thama
+export async function getAllBookings(req, res) {
+  const bookingData = await Booking.find();
+  res.status(200).json({
+    message: "Booking data retriving succesfully",
+    bookings: bookingData,
+  });
+}
+
+export async function updateBookingDetails(req, res) {
+  try {
+    if (!checkIsAdmin(req) && !checkIsCustomer(req)) {
+      return res.status(403).json({
+        message: "Please log in to continue with your booking.",
+      });
+    }
+
+    const bookingId = req.params.bookingId;
+
+    console.log(bookingId);
+    const bookingData = req.body;
+
+    const ishave = await Booking.findOne({ bookingId: bookingId });
+
+    if (!ishave) {
+      return res.status(404).json({
+        message:
+          "Booking not found. Please check the booking ID and try again.",
+      });
+    }
+
+    await Booking.updateOne({ bookingId: bookingId }, bookingData);
+
+    res.status(200).json({
+      message: "Booking updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: " something went  wrong ,please try again",
+      error: error.message,
+    });
+  }
+}
