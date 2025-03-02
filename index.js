@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import categoryRouter from "./routes/categoryRouter.js";
 import dotenv from "dotenv";
 import roomRouter from "./routes/roomsRouter.js";
+import bookingrouter from "./routes/bookingRouter.js";
 dotenv.config();
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/api/gallery", galleryItemRouter);
 app.use("/api/catagories", categoryRouter);
 
 app.use("/api/rooms", roomRouter);
+app.use("/api/booking", bookingrouter);
 
 // A simple route for the homepage
 
