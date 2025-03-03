@@ -50,11 +50,38 @@ export async function createBooking(req, res) {
 //this not good⛔⛔⛔⛔⛔⛔⛔⛔⛔
 //methana e userge email eka ganna haduve na thama
 export async function getAllBookings(req, res) {
-  const bookingData = await Booking.find();
-  res.status(200).json({
-    message: "Booking data retriving succesfully",
-    bookings: bookingData,
-  });
+  try {
+    if (!checkIsAdmin(req) && !checkIsCustomer(req)) {
+      res.status(403).json({
+        message: "Unautherized access please login validate user",
+      });
+    }
+    if (req.user.type == "admin") {
+      const bookingData = await Booking.find();
+      res.status(200).json({
+        message: "Booking data retriving succesfully",
+        bookings: bookingData,
+      });
+    } else {
+      if (req.user.type == "customer") {
+        const bookingData = await Booking.find({ email: req.user.email });
+
+        if (bookingData.length === 0) {
+          return res.status(404).json({
+            message: "booking not found",
+          });
+        }
+        res.status(200).json({
+          bookings: bookingData,
+        });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+      error: error.message,
+    });
+  }
 }
 
 export async function updateBookingDetails(req, res) {
