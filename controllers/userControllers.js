@@ -57,6 +57,8 @@ export async function loginUser(req, res) {
   try {
     const credentials = req.body;
 
+    console.log(req.body);
+
     const user = await User.findOne({
       email: credentials.email,
     });
@@ -88,6 +90,7 @@ export async function loginUser(req, res) {
 
       // Create a JWT token
       const token = jwt.sign(payload, process.env.SECRET_KEY);
+      console.log(token);
 
       res.json({
         message: "Login successfully",
@@ -102,6 +105,7 @@ export async function loginUser(req, res) {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Something went wrong while logging in. Please try again later.",
       error: error.message,
@@ -131,4 +135,19 @@ export function checkIsCustomer(req) {
   }
 
   return true;
+}
+
+export function getOneUser(req, res) {
+  const user = req.user;
+
+  if (!user) {
+    res.status(404).json({
+      message: "User not found",
+    });
+  } else {
+    res.status(200).json({
+      message: "ufound",
+      user: user,
+    });
+  }
 }
