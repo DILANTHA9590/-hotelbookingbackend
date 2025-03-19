@@ -151,3 +151,39 @@ export async function deleteBooking(req, res) {
     });
   }
 }
+
+export async function updateBookingStatus(req, res) {
+  console.log("run");
+  try {
+    if (!checkIsAdmin) {
+      return res.status(403).json({
+        message: "Unautherized Access. please login to admin account",
+      });
+    }
+
+    const ishave = await Booking.findOne({ bookingId: req.params.bookingId });
+
+    if (!ishave) {
+      res.status(404).status({
+        message: " Booking id not found",
+      });
+    } else {
+      const updateStatus = req.body;
+      console.log(req.body);
+      await Booking.updateOne(
+        { bookingId: req.params.bookingId },
+        updateStatus
+      );
+      console.log("inside this");
+
+      res.status(200).json({
+        message: " update Successfully",
+      });
+    }
+  } catch (error) {
+    res.status.json({
+      message: "Something went a wrong please try again",
+      message: error.message,
+    });
+  }
+}
