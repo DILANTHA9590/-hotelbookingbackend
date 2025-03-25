@@ -43,14 +43,40 @@ export async function postUser(req, res) {
   }
 }
 
-export function getUser(req, res) {
-  const user = req.body;
+export async function getUser(req, res) {
+  console.log("runnig");
+  try {
+    if (checkIsAdmin) {
+      const users = await User.find();
+      console.log(users);
 
-  User.find().then((userList) => {
-    res.json({
-      list: userList,
-    });
-  });
+      res.status(200).json({
+        message: "Fetching data sucsessfully",
+        users,
+      });
+    } else {
+      const email = req.user.email;
+
+      const customer = await User.findOne({ email: email });
+
+      if (!customer) {
+        return res.status.json({
+          message: "User Not Found",
+        });
+      }
+      const customerData = {
+        email: customer.email,
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        whatsApp: customer.whatsApp,
+        phone: customer.phone,
+        type: customer.type,
+      };
+      res.status(200).json({
+        customerData,
+      });
+    }
+  } catch (error) {}
 }
 
 export async function loginUser(req, res) {
@@ -69,7 +95,7 @@ export async function loginUser(req, res) {
       });
     }
 
-    if (user.disabled) {
+    if (user.disabled == true) {
       return res.status(403).json({
         message: "Your account has been suspended. Please contact the admin.",
       });
@@ -78,7 +104,7 @@ export async function loginUser(req, res) {
     // Verify the password using argon2
     const isMatch = await argon2.verify(user.password, credentials.password);
     if (!isMatch) {
-      return res.status(403).json({ message: "Invalid email or password" });
+      return res.status(200).json({ message: "Invalid email or password" });
     } else {
       const payload = {
         id: user._id,
@@ -146,8 +172,38 @@ export function getOneUser(req, res) {
     });
   } else {
     res.status(200).json({
-      message: "ufound",
+      message: "found",
       user: user,
+    });
+  }
+}
+
+export async function updateUserIsBlock(req, res) {
+  if (!checkIsAdmin(req)) {
+    return res.status(403).json({
+      message: "Unautherized access",
+    });
+  }
+  try {
+    const checkIsHave = await User.findOne({ email: req.params.email });
+
+    console.log(checkIsHave);
+
+    if (!checkIsHave) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    await User.updateOne({ email: req.params.email }, req.body);
+
+    res.status(200).json({
+      message: "User block status update successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      message: "Some thing went a wrong please try again",
     });
   }
 }
