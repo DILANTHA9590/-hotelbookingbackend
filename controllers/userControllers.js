@@ -34,6 +34,17 @@ export async function postUser(req, res) {
 
     newUser.save();
 
+    const otp = Math.floor(1000 + Math.random() * 9000);
+
+    const newOtp = new Otp({
+      email: user.email,
+      otp: otp,
+    });
+
+    await newOtp.save();
+
+    sendOtpEmail(user.email, otp);
+
     res.status(201).json({
       message: " User Creation Succesfully",
     });
@@ -210,7 +221,7 @@ export async function updateUserIsBlock(req, res) {
   }
 }
 
-export function sendSampleEmail(email, otp) {
+export function sendOtpEmail(email, otp) {
   const transport = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -225,8 +236,8 @@ export function sendSampleEmail(email, otp) {
   const message = {
     from: "dilantha9590@gmail.com",
     to: email,
-    subject: " Sample Email",
-    text: "This is a sample email",
+    subject: " Validating Otp",
+    text: otp,
   };
 
   transport.sendMail(message, (err, info) => {
