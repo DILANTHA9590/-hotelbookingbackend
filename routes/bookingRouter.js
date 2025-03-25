@@ -1,6 +1,7 @@
 import express from "express";
-import {
+import retrieveBookingByDate, {
   createBooking,
+  createBookingUsingCategory,
   deleteBooking,
   getAllBookings,
   updateBookingDetails,
@@ -14,5 +15,7 @@ bookingrouter.get("/", getAllBookings);
 bookingrouter.delete("/:bookingId", deleteBooking);
 bookingrouter.put("/status/:bookingId", updateBookingStatus);
 bookingrouter.put("/:bookingId", updateBookingDetails);
+bookingrouter.post("/filteredbooking", retrieveBookingByDate);
+bookingrouter.post("/createbycategory", createBookingUsingCategory);
 
 export default bookingrouter;
