@@ -1,6 +1,7 @@
 import e from "express";
 import Booking from "../models/booking.js";
 import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
+import Room from "../models/room.js";
 
 export async function createBooking(req, res) {
   try {
@@ -241,7 +242,7 @@ export async function createBookingUsingCategory(req, res) {
 
     if (availableBookings.length == 0) {
       return res.status(200).json({
-        message: "Bookings Not found",
+        message: "",
       });
     }
 
@@ -255,7 +256,51 @@ export async function createBookingUsingCategory(req, res) {
     const bookingRoomId = availableBookings.map((rooms) => rooms.roomId);
     console.log(bookingRoomId);
 
-    console.log("m");
+    const rooms = Room.find({
+      roomId: {
+        // we get bookin unavaible rooms
+        $nin: bookingRoomId,
+      },
+      category: req.body.category,
+    });
+    if (rooms.length == 0) {
+      res.status(200).json({
+        message: "Sorry! No rooms available for your chosen dates 😔",
+      });
+    } else {
+      const orderCount = await Booking.countDocuments({}).exec();
+      console.log(orderCount);
+      const prefix = "INV";
+      let orderId;
+
+      if (orderCount === 0) {
+        orderId = prefix + 1001;
+      } else {
+        orderId = prefix + (1001 + orderCount);
+      }
+      // const email = req.user.email;
+
+      // const bookingData = req.body;
+      // bookingData.bookingId = orderId;
+
+      // bookingData.email = email;
+
+      const bookingData = {
+        ...req.body,
+        bookingId: orderId,
+        roomId: rooms[0].roomId,
+        email: req.user.email,
+        start: start,
+        end: end,
+      };
+      const newBooking = new Booking(bookingData);
+
+      await newBooking.save();
+
+      res.status(200).json({
+        message: "Booking created succesfully",
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({
