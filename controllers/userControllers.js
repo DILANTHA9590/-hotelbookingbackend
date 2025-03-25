@@ -2,6 +2,8 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import Otp from "../models/otp.js";
 
 dotenv.config();
 export async function postUser(req, res) {
@@ -206,4 +208,32 @@ export async function updateUserIsBlock(req, res) {
       message: "Some thing went a wrong please try again",
     });
   }
+}
+
+export function sendSampleEmail(email, otp) {
+  const transport = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: "dilantha9590@gmail.com",
+      pass: "iqnlaugybucodexw",
+    },
+  });
+
+  const message = {
+    from: "dilantha9590@gmail.com",
+    to: email,
+    subject: " Sample Email",
+    text: "This is a sample email",
+  };
+
+  transport.sendMail(message, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(info);
+    }
+  });
 }
