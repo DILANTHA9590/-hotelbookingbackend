@@ -1,3 +1,4 @@
+import e from "express";
 import Booking from "../models/booking.js";
 import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
 
@@ -184,6 +185,81 @@ export async function updateBookingStatus(req, res) {
     res.status.json({
       message: "Something went a wrong please try again",
       message: error.message,
+    });
+  }
+}
+
+export default async function retrieveBookingByDate(req, res) {
+  try {
+    const start = req.body.start;
+    const end = req.body.end;
+
+    const result = await Booking.find({
+      start: {
+        $gte: start,
+      },
+
+      end: {
+        $lt: new Date(end),
+      },
+    });
+
+    res.status(200).json({
+      message: "Filtered Bookings",
+      result: result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+      message: error.message,
+    });
+  }
+}
+
+export async function createBookingUsingCategory(req, res) {
+  const start = new Date(req.body.start);
+  const end = new Date(req.body.end);
+  try {
+    const availableBookings = await Booking.find({
+      $or: [
+        {
+          start: {
+            $gte: start,
+            $lt: end,
+          },
+        },
+
+        {
+          end: {
+            $gt: start,
+            $lte: end,
+          },
+        },
+      ],
+    });
+
+    if (availableBookings.length == 0) {
+      return res.status(200).json({
+        message: "Bookings Not found",
+      });
+    }
+
+    // console.log(availableBookings);
+
+    // const bookingRoomId = [];
+
+    // for (let i = 0; i < availableBookings.length; i++) {
+    //   bookingRoomId[i] = availableBookings.roomId[i];
+    // }
+    const bookingRoomId = availableBookings.map((rooms) => rooms.roomId);
+    console.log(bookingRoomId);
+
+    console.log("m");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: error.message,
     });
   }
 }
