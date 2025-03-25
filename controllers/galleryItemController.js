@@ -71,7 +71,7 @@ export async function deleteGalleryItem(req, res) {
 }
 
 export async function updateGalley(req, res) {
-  if (!checkIsAdmin) {
+  if (!checkIsAdmin(req)) {
     return res.status(200).json({
       message: "Unautherized Access",
     });
