@@ -4,6 +4,7 @@ import {
   getUser,
   loginUser,
   postUser,
+  sendSampleEmail,
   updateUserIsBlock,
 } from "../controllers/userControllers.js";
 
@@ -14,5 +15,6 @@ userRouter.get("/", getUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/getUser", getOneUser);
 userRouter.put("/:email", updateUserIsBlock);
+userRouter.post("/email", sendSampleEmail);
 
 export default userRouter;
