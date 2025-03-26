@@ -56,26 +56,42 @@ export async function postUser(req, res) {
 }
 
 export async function getUser(req, res) {
-  console.log("runnig");
+  console.log("running");
   try {
-    if (checkIsAdmin) {
-      const users = await User.find();
+    if (checkIsAdmin(req)) {
+      // Get page number and page size from query parameters, set default values
+      const page = parseInt(req.body.page) || 1;
+      const pageSize = parseInt(req.body.pageSize) || 10;
+
+      // Calculate the number of documents to skip
+      const skip = (page - 1) * pageSize;
+
+      // Fetch users with pagination
+      const users = await User.find().skip(skip).limit(pageSize);
+      const totalUsers = await User.countDocuments(); // Get total user count
+
       console.log(users);
 
       res.status(200).json({
-        message: "Fetching data sucsessfully",
+        message: "Fetching data successfully",
         users,
+        pagination: {
+          currentPage: page,
+          pageSize,
+          totalUsers,
+          totalPages: Math.ceil(totalUsers / pageSize),
+        },
       });
     } else {
       const email = req.user.email;
-
-      const customer = await User.findOne({ email: email });
+      const customer = await User.findOne({ email });
 
       if (!customer) {
-        return res.status.json({
+        return res.status(404).json({
           message: "User Not Found",
         });
       }
+
       const customerData = {
         email: customer.email,
         firstName: customer.firstName,
@@ -84,11 +100,15 @@ export async function getUser(req, res) {
         phone: customer.phone,
         type: customer.type,
       };
+
       res.status(200).json({
         customerData,
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
 export async function loginUser(req, res) {
