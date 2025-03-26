@@ -14,8 +14,6 @@ export async function postUser(req, res) {
 
     const checkUser = await User.findOne({ email: user.email });
 
-    console.log("checkuser", checkUser);
-
     if (checkUser) {
       res.status(400).json({
         message: "Already using this email",
@@ -35,6 +33,7 @@ export async function postUser(req, res) {
     newUser.save();
 
     const otp = Math.floor(1000 + Math.random() * 9000);
+    console.log(otp);
 
     const newOtp = new Otp({
       email: user.email,
@@ -105,6 +104,12 @@ export async function loginUser(req, res) {
     if (!user) {
       return res.status(403).json({
         message: "User not found",
+      });
+    }
+
+    if (user.emailVerified == false) {
+      return res.status(404).json({
+        message: "Please verify your email before logging in. ",
       });
     }
 
@@ -221,7 +226,39 @@ export async function updateUserIsBlock(req, res) {
   }
 }
 
+export async function deleteUser(req, res) {
+  if (!checkIsAdmin(req)) {
+    return res.status(403).json({
+      message: "Unautherized Access",
+    });
+  }
+
+  try {
+    const email = req.params.email;
+
+    const deleteUser = await User.findOneAndDelete({ email: email });
+
+    console.log(deleteUser);
+
+    if (deleteUser) {
+      res.status(200).json({
+        message: " User Deleted successfully",
+      });
+    } else {
+      res.status(404).json({
+        message: "User not found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong pleasew try again",
+      error: error.message,
+    });
+  }
+}
+
 export function sendOtpEmail(email, otp) {
+  console.log("otp inside send", otp);
   const transport = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -237,7 +274,7 @@ export function sendOtpEmail(email, otp) {
     from: "dilantha9590@gmail.com",
     to: email,
     subject: " Validating Otp",
-    text: otp,
+    text: `you Otp is ${otp}`,
   };
 
   transport.sendMail(message, (err, info) => {
@@ -247,4 +284,34 @@ export function sendOtpEmail(email, otp) {
       console.log(info);
     }
   });
+}
+
+export function verifyUserEmail(req, res) {
+  const email = req.body.email;
+  const otp = req.body.otp;
+
+  Otp.find({ email: email })
+    .sort({ date: -1 })
+    .then((otpList) => {
+      if (otpList.length == 0) {
+        res.status(404).json({
+          message: "Otp is invalid",
+        });
+      } else {
+        const latestOtp = otpList[0];
+        if (latestOtp.otp == otp) {
+          User.findOneAndUpdate({ email: email }, { emailVerified: true }).then(
+            () => {
+              res.status(200).json({
+                message: "User email verified success fully",
+              });
+            }
+          );
+        } else {
+          res.json({
+            message: "otp is invalid",
+          });
+        }
+      }
+    });
 }
