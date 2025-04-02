@@ -68,11 +68,35 @@ export async function updateRoomDetails(req, res) {
 
 export async function getRooms(req, res) {
   try {
-    const roomList = await Room.find();
+    if (!checkIsAdmin(req)) {
+      res.status(403).json({
+        message: "Unautherized access",
+      });
+    }
+
+    const page = parseInt(req.body.page) || 1;
+    const pageSize = parseInt(req.body.pageSize) || 10;
+    console.log(page);
+    console.log(pageSize);
+
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * pageSize;
+
+    // Fetch users with pagination
+    const rooms = await Room.find().skip(skip).limit(pageSize);
+    const totalRooms = await Room.countDocuments(); // Get total user count
+    console.log(rooms);
+    console.log(totalRooms);
 
     res.status(200).json({
-      message: "Data retrieved successfully.",
-      rooms: roomList,
+      message: "Fetching data successfully",
+      rooms,
+      pagination: {
+        curruntPage: page,
+        pageSize,
+        totalRooms,
+        totalPages: Math.ceil(totalRooms / pageSize),
+      },
     });
   } catch (error) {
     res.status(500).json({
