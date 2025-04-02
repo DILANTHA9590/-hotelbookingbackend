@@ -176,7 +176,6 @@ export async function updateBookingStatus(req, res) {
         { bookingId: req.params.bookingId },
         updateStatus
       );
-      console.log("inside this");
 
       res.status(200).json({
         message: " update Successfully",
