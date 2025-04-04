@@ -136,3 +136,44 @@ export async function deleteRoom(req, res) {
     });
   }
 }
+
+export async function getRoomsCustomers(req, res) {
+  try {
+    const category = req.query;
+    const rooms = await Room.find(category);
+
+    res.status(200).json({
+      message: `Category '${category}' data retrieved successfully.`,
+      rooms,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something Went a wrong Please try again",
+      message: error.message,
+    });
+  }
+}
+
+export async function getRoombyId(req, res) {
+  try {
+    const roomId = req.params.roomId;
+
+    const roomsData = await Room.findOne({ roomId });
+
+    if (!roomId) {
+      res.status(404).json({
+        message: `${roomId} Room is not found`,
+      });
+    } else {
+      res.status(200).json({
+        message: "Room data retrieved successfully ",
+        roomsData,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+      error: error.message,
+    });
+  }
+}
