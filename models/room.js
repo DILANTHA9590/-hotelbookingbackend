@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const roomSchema = mongoose.Schema({
   roomId: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },
@@ -10,6 +10,7 @@ const roomSchema = mongoose.Schema({
   category: {
     type: String,
     required: true,
+    lowercase: true,
   },
 
   maxGuests: {
