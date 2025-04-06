@@ -4,6 +4,7 @@ import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
 import Room from "../models/room.js";
 
 export async function createBooking(req, res) {
+  console.log("run this");
   try {
     if (!checkIsCustomer(req)) {
       return res.status(403).json({
@@ -240,7 +241,7 @@ export async function createBookingUsingCategory(req, res) {
     });
 
     if (availableBookings.length == 0) {
-      return res.status(200).json({
+      res.status(200).json({
         message: "",
       });
     }
@@ -255,7 +256,7 @@ export async function createBookingUsingCategory(req, res) {
     const bookingRoomId = availableBookings.map((rooms) => rooms.roomId);
     console.log(bookingRoomId);
 
-    const rooms = Room.find({
+    const rooms = await Room.find({
       roomId: {
         // we get bookin unavaible rooms
         $nin: bookingRoomId,
@@ -263,7 +264,7 @@ export async function createBookingUsingCategory(req, res) {
       category: req.body.category,
     });
     if (rooms.length == 0) {
-      res.status(200).json({
+      return res.status(200).json({
         message: "Sorry! No rooms available for your chosen dates 😔",
       });
     } else {
