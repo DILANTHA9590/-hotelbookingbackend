@@ -4,6 +4,7 @@ import argon2 from "argon2";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import Otp from "../models/otp.js";
+import userRouter from "../routes/userRoute.js";
 
 dotenv.config();
 export async function postUser(req, res) {
@@ -60,14 +61,23 @@ export async function getUser(req, res) {
   try {
     if (checkIsAdmin(req)) {
       // Get page number and page size from query parameters, set default values
-      const page = parseInt(req.body.page) || 1;
-      const pageSize = parseInt(req.body.pageSize) || 10;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+      const email = req.query.email;
+      console.log(email);
 
       // Calculate the number of documents to skip
       const skip = (page - 1) * pageSize;
 
       // Fetch users with pagination
-      const users = await User.find().skip(skip).limit(pageSize);
+      const users = await User.find({
+        $or: [
+          { name: { $regex: email, $options: "i" } }, // name match
+          { email: { $regex: email, $options: "i" } }, // age match (number)
+        ],
+      })
+        .skip(skip)
+        .limit(pageSize);
       const totalUsers = await User.countDocuments(); // Get total user count
 
       console.log(users);
