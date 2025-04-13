@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import roomRouter from "./routes/roomsRouter.js";
 import bookingrouter from "./routes/bookingRouter.js";
 import cors from "cors";
+import StudentRouter from "./routes/studentRouter.js";
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.use("/api/catagories", categoryRouter);
 
 app.use("/api/rooms", roomRouter);
 app.use("/api/booking", bookingrouter);
+app.use("/api/student", StudentRouter);
 
 // A simple route for the homepage
 
