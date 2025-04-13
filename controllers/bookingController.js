@@ -53,6 +53,15 @@ export async function createBooking(req, res) {
 //this not good⛔⛔⛔⛔⛔⛔⛔⛔⛔
 //methana e userge email eka ganna haduve na thama
 export async function getAllBookings(req, res) {
+  console.log(req);
+  console.log("runnnnnnnnnnnnnnnnnnn");
+  const inv = req.query.id || ""; // null value එකක් avoid කරන්න
+
+  const bookingData = await Booking.find({
+    bookingId: { $regex: inv, $options: "i" },
+  });
+
+  console.log("frontenddata", inv);
   try {
     if (!checkIsAdmin(req) && !checkIsCustomer(req)) {
       res.status(403).json({
@@ -60,7 +69,13 @@ export async function getAllBookings(req, res) {
       });
     }
     if (req.user.type == "admin") {
-      const bookingData = await Booking.find();
+      const bookingData = await Booking.find({
+        $or: [
+          { bookingId: { $regex: inv, $options: "i" } },
+          { bookingId: { $regex: inv, $options: "i" } },
+        ],
+      });
+      console.log(bookingData);
       res.status(200).json({
         message: "Booking data retriving succesfully",
         bookings: bookingData,
