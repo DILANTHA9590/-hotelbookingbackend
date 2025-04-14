@@ -16,7 +16,7 @@ userRouter.post("/", postUser);
 userRouter.delete("/:email", deleteUser);
 userRouter.get("/getall", getUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/getUser", getOneUser);
+userRouter.get("/getuser", getOneUser);
 userRouter.put("/:email", updateUserIsBlock);
 userRouter.post("/verifyemail", verifyUserEmail);
 
