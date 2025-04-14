@@ -36,8 +36,11 @@ export async function createBooking(req, res) {
     };
 
     const newBooking = new Booking(bookingData);
-
+    const roomId = req.body.roomId;
+    console.log("sssssssssssssssssssssssss", roomId);
     await newBooking.save();
+
+    await Room.findOneAndUpdate({ roomId: roomId }, { available: false });
 
     res.status(200).json({
       message: "Booking created succesfully",
@@ -50,21 +53,12 @@ export async function createBooking(req, res) {
   }
 }
 
-//this not good⛔⛔⛔⛔⛔⛔⛔⛔⛔
-//methana e userge email eka ganna haduve na thama
 export async function getAllBookings(req, res) {
-  console.log(req);
-  console.log("runnnnnnnnnnnnnnnnnnn");
-  const inv = req.query.id || ""; // null value එකක් avoid කරන්න
+  const inv = req.query.id || "";
 
-  const bookingData = await Booking.find({
-    bookingId: { $regex: inv, $options: "i" },
-  });
-
-  console.log("frontenddata", inv);
   try {
     if (!checkIsAdmin(req) && !checkIsCustomer(req)) {
-      res.status(403).json({
+      return res.status(403).json({
         message: "Unautherized access please login validate user",
       });
     }
@@ -81,12 +75,16 @@ export async function getAllBookings(req, res) {
         bookings: bookingData,
       });
     } else {
-      if (req.user.type == "customer") {
-        const bookingData = await Booking.find({ email: req.user.email });
+      console.log("inside this");
+      if (req.user.type === "customer") {
+        const email = req.user.email;
+        console.log(email);
+        const bookingData = await Booking.find({ email: email });
+        console.log("bookingData", bookingData);
 
         if (bookingData.length === 0) {
-          return res.status(404).json({
-            message: "booking not found",
+          return res.status(200).json({
+            message: "Booking not found",
           });
         }
         res.status(200).json({
