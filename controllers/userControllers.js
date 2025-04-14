@@ -211,17 +211,19 @@ export function checkIsCustomer(req) {
   return true;
 }
 
-export function getOneUser(req, res) {
-  const user = req.user;
-
-  if (!user) {
+export async function getOneUser(req, res) {
+  const email = req.user.email;
+  console.log("emaiiiiiiiiiiil", email);
+  if (!email) {
     res.status(404).json({
       message: "User not found",
     });
   } else {
+    const user = await User.findOne({ email: email });
+    console.log(user);
     res.status(200).json({
       message: "found",
-      user: user,
+      user,
     });
   }
 }
