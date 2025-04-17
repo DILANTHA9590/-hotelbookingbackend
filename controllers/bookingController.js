@@ -4,7 +4,6 @@ import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
 import Room from "../models/room.js";
 
 export async function createBooking(req, res) {
-  console.log("run this");
   try {
     if (!checkIsCustomer(req)) {
       return res.status(403).json({
@@ -35,15 +34,27 @@ export async function createBooking(req, res) {
       email: req.user.email,
     };
 
+    console.log("booking data", bookingData);
+
     const newBooking = new Booking(bookingData);
     const roomId = req.body.roomId;
-    console.log("sssssssssssssssssssssssss", roomId);
+
+    const findbooking = await Booking.findOne({ roomId: roomId });
+    console.log("find", findbooking);
+
+    if (findbooking) {
+      return res.status(200).json({
+        message: "Your booking is completed please wait",
+      });
+    }
+
     await newBooking.save();
 
     await Room.findOneAndUpdate({ roomId: roomId }, { available: false });
 
     res.status(200).json({
       message: "Booking created succesfully",
+      naviga,
     });
   } catch (error) {
     res.status(500).json({
