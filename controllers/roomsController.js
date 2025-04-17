@@ -139,8 +139,9 @@ export async function deleteRoom(req, res) {
 
 export async function getRoomsCustomers(req, res) {
   try {
-    const category = req.query;
-    const rooms = await Room.find(category);
+    const category = req.query.category;
+    console.log(category);
+    const rooms = await Room.find({ category: category, available: true });
 
     res.status(200).json({
       message: `Category '${category}' data retrieved successfully.`,
