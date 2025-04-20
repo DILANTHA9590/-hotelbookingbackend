@@ -48,6 +48,10 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  expired: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Booking = mongoose.model("Bookings", bookingSchema);
