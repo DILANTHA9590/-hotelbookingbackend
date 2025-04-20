@@ -25,7 +25,6 @@ const roomSchema = mongoose.Schema({
 
     default: true,
   },
-
   photos: [
     {
       type: String,
