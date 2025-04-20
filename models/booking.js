@@ -43,6 +43,11 @@ const bookingSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
+  available: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Booking = mongoose.model("Bookings", bookingSchema);
