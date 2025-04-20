@@ -4,6 +4,7 @@ import retrieveBookingByDate, {
   createBookingUsingCategory,
   deleteBooking,
   getAllBookings,
+  getExpireBooking,
   updateBookingDetails,
   updateBookingStatus,
 } from "../controllers/bookingController.js";
@@ -17,5 +18,6 @@ bookingrouter.put("/status/:bookingId", updateBookingStatus);
 bookingrouter.put("/:bookingId", updateBookingDetails);
 bookingrouter.post("/filteredbooking", retrieveBookingByDate);
 bookingrouter.post("/createbycategory", createBookingUsingCategory);
+bookingrouter.get("/getexpirebookings", getExpireBooking);
 
 export default bookingrouter;
