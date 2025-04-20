@@ -338,7 +338,7 @@ export async function getExpireBooking(req, res) {
     let date = new Date();
     date = date.toDateString();
     const expiredBooking = await Booking.find({
-      end: { $lt: date },
+      $and: [{ end: { $lt: new Date() } }, { available: { $nin: true } }],
     });
 
     res.status(200).json({
