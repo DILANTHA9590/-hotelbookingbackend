@@ -178,3 +178,35 @@ export async function getRoombyId(req, res) {
     });
   }
 }
+
+export async function updateRoomAvailbleStatus(req, res) {
+  try {
+    if (!checkIsAdmin(req)) {
+      return res.status(403).json({
+        message: "please login to Admin account",
+      });
+    }
+    const available = req.body.update;
+    const roomId = req.params.roomId;
+
+    console.log("roomID >>>>>>>>>>>", roomId);
+    console.log("availble >>>>>>>>", available);
+
+    const updateRooms = await Room.findOneAndUpdate(
+      { roomId: roomId },
+      { available: available },
+      { new: true }
+    );
+
+    if (!updateRooms) {
+      res.status(404).json({
+        message: `This ${roomId} not found`,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again",
+    });
+    console.log(error);
+  }
+}
