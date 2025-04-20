@@ -332,3 +332,17 @@ export async function createBookingUsingCategory(req, res) {
     });
   }
 }
+
+export async function getExpireBooking(req, res) {
+  try {
+    let date = new Date();
+    date = date.toDateString();
+    const expiredBooking = await Booking.find({
+      end: { $lt: date },
+    });
+
+    res.status(200).json({
+      expiredBooking,
+    });
+  } catch (error) {}
+}
