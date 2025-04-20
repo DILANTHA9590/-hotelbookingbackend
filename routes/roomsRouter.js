@@ -5,6 +5,7 @@ import {
   getRoombyId,
   getRooms,
   getRoomsCustomers,
+  updateRoomAvailbleStatus,
   updateRoomDetails,
 } from "../controllers/roomsController.js";
 
@@ -16,5 +17,6 @@ roomRouter.post("/getall", getRooms);
 roomRouter.put("/:roomId", updateRoomDetails);
 roomRouter.delete("/:roomId", deleteRoom);
 roomRouter.get("/:roomId", getRoombyId);
+roomRouter.post("/:roomId", updateRoomAvailbleStatus);
 
 export default roomRouter;
