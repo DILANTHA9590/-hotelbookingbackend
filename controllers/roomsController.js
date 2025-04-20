@@ -1,4 +1,6 @@
+import Booking from "../models/booking.js";
 import Room from "../models/room.js";
+import bookingrouter from "../routes/bookingRouter.js";
 import { checkIsAdmin } from "./userControllers.js";
 
 export async function createRoom(req, res) {
@@ -189,9 +191,6 @@ export async function updateRoomAvailbleStatus(req, res) {
     const available = req.body.update;
     const roomId = req.params.roomId;
 
-    console.log("roomID >>>>>>>>>>>", roomId);
-    console.log("availble >>>>>>>>", available);
-
     const updateRooms = await Room.findOneAndUpdate(
       { roomId: roomId },
       { available: available },
@@ -199,14 +198,30 @@ export async function updateRoomAvailbleStatus(req, res) {
     );
 
     if (!updateRooms) {
-      res.status(404).json({
+      return res.status(404).json({
         message: `This ${roomId} not found`,
       });
     }
+
+    const updateBooking = await Booking.findOneAndUpdate(
+      { roomId: roomId },
+      { available: available },
+      { new: true }
+    );
+
+    if (!updateBooking) {
+      return res.status(404).json({
+        message: `⚠️ Room updated, but booking not found for room ID '${roomId}'`,
+      });
+    }
+
+    return res.status(200).json({
+      message: `✅ Room and booking availability updated successfully!`,
+    });
   } catch (error) {
     res.status(500).json({
-      message: "Something went a wrong please try again",
+      message: "🚨 Something went wrong! Please try again later.",
+      error: error.message,
     });
-    console.log(error);
   }
 }
