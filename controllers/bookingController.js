@@ -90,17 +90,42 @@ export async function getAllBookings(req, res) {
       if (req.user.type === "customer") {
         const email = req.user.email;
         console.log(email);
+
+        const userExpiredBooking = await Booking.find({
+          $and: [
+            { email: email },
+            { end: { $lt: new Date() } },
+            { expired: { $nin: true } },
+          ],
+        });
+
+        const userExpiredBookingId = userExpiredBooking.map(
+          (expiredBooking) => {
+            return expiredBooking.bookingId;
+          }
+        );
+
+        console.log("expired booking id", userExpiredBookingId);
+
+        const updatedRooms = await Booking.updateMany(
+          {
+            bookingId: {
+              $in: userExpiredBookingId,
+            },
+          },
+          { $set: { expired: true } }
+        );
+
         const bookingData = await Booking.find({ email: email });
-        console.log("bookingData", bookingData);
+        res.status(200).json({
+          bookings: bookingData,
+        });
 
         if (bookingData.length === 0) {
           return res.status(200).json({
             message: "Booking not found",
           });
         }
-        res.status(200).json({
-          bookings: bookingData,
-        });
       }
     }
   } catch (error) {
@@ -108,6 +133,8 @@ export async function getAllBookings(req, res) {
       message: "Something went a wrong please try again",
       error: error.message,
     });
+
+    console.log(error);
   }
 }
 
