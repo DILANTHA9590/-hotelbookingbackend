@@ -80,7 +80,7 @@ export async function getAllBookings(req, res) {
           { bookingId: { $regex: inv, $options: "i" } },
         ],
       });
-      console.log(bookingData);
+
       res.status(200).json({
         message: "Booking data retriving succesfully",
         bookings: bookingData,
@@ -133,8 +133,6 @@ export async function getAllBookings(req, res) {
       message: "Something went a wrong please try again",
       error: error.message,
     });
-
-    console.log(error);
   }
 }
 
@@ -148,7 +146,6 @@ export async function updateBookingDetails(req, res) {
 
     const bookingId = req.params.bookingId;
 
-    console.log(bookingId);
     const bookingData = req.body;
 
     const ishave = await Booking.findOne({ bookingId: bookingId });
@@ -185,7 +182,6 @@ export async function deleteBooking(req, res) {
     const bookingId = req.params.bookingId;
 
     const checkIsHave = await Booking.findOne({ bookingId: bookingId });
-    console.log(checkIsHave);
 
     if (!checkIsHave) {
       res.status(404).json({
@@ -207,7 +203,6 @@ export async function deleteBooking(req, res) {
 }
 
 export async function updateBookingStatus(req, res) {
-  console.log("run");
   try {
     if (!checkIsAdmin) {
       return res.status(403).json({
@@ -261,7 +256,6 @@ export default async function retrieveBookingByDate(req, res) {
       result: result,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       message: "Something went a wrong please try again",
       message: error.message,
@@ -371,5 +365,10 @@ export async function getExpireBooking(req, res) {
     res.status(200).json({
       expiredBooking,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went a wrong please try again ",
+      error: error.message,
+    });
+  }
 }
