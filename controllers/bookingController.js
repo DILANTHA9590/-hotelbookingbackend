@@ -99,6 +99,13 @@ export async function getAllBookings(req, res) {
           ],
         });
 
+        if (userExpiredBooking.length == 0) {
+          res.status(200).json({
+            message:
+              "You have not made any bookings yet. Start by exploring our packages!",
+          });
+        }
+
         const userExpiredBookingId = userExpiredBooking.map(
           (expiredBooking) => {
             return expiredBooking.bookingId;
