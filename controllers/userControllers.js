@@ -347,3 +347,23 @@ export function verifyUserEmail(req, res) {
       }
     });
 }
+
+export async function getCurrentUser(req, res) {
+  console.log("run this");
+  try {
+    const currentUserData = req.user;
+
+    if (!currentUserData) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized. No user data found." });
+    }
+
+    res.status(200).json({
+      message: "Authorization success",
+      user: currentUserData,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
