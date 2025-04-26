@@ -1,4 +1,3 @@
-import e from "express";
 import Booking from "../models/booking.js";
 import { checkIsAdmin, checkIsCustomer } from "./userControllers.js";
 import Room from "../models/room.js";
@@ -12,7 +11,7 @@ export async function createBooking(req, res) {
     }
 
     const orderCount = await Booking.countDocuments({}).exec();
-    console.log(orderCount);
+
     const prefix = "INV";
     let orderId;
 
@@ -40,7 +39,6 @@ export async function createBooking(req, res) {
     const roomId = req.body.roomId;
 
     const findbooking = await Booking.findOne({ roomId: roomId });
-    console.log("find", findbooking);
 
     if (findbooking) {
       return res.status(200).json({
@@ -54,9 +52,9 @@ export async function createBooking(req, res) {
 
     res.status(200).json({
       message: "Booking created succesfully",
-      naviga,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Something went a wrong please try again",
       error: error.message,
@@ -99,40 +97,33 @@ export async function getAllBookings(req, res) {
           ],
         });
 
-        if (userExpiredBooking.length == 0) {
-          res.status(200).json({
-            message:
-              "You have not made any bookings yet. Start by exploring our packages!",
-          });
+        if (userExpiredBooking.length != 0) {
+          const userExpiredBookingId = userExpiredBooking.map(
+            (expiredBooking) => {
+              return expiredBooking.bookingId;
+            }
+          );
+
+          const updatedRooms = await Booking.updateMany(
+            {
+              bookingId: {
+                $in: userExpiredBookingId,
+              },
+            },
+            { $set: { expired: true } }
+          );
         }
 
-        const userExpiredBookingId = userExpiredBooking.map(
-          (expiredBooking) => {
-            return expiredBooking.bookingId;
-          }
-        );
-
-        console.log("expired booking id", userExpiredBookingId);
-
-        const updatedRooms = await Booking.updateMany(
-          {
-            bookingId: {
-              $in: userExpiredBookingId,
-            },
-          },
-          { $set: { expired: true } }
-        );
-
         const bookingData = await Booking.find({ email: email });
-        res.status(200).json({
-          bookings: bookingData,
-        });
 
         if (bookingData.length === 0) {
           return res.status(200).json({
             message: "Booking not found",
           });
         }
+        res.status(200).json({
+          bookings: bookingData,
+        });
       }
     }
   } catch (error) {
