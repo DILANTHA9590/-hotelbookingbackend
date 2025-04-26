@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  getCurrentUser,
   getOneUser,
   getUser,
   loginUser,
@@ -19,5 +20,6 @@ userRouter.post("/login", loginUser);
 userRouter.get("/getuser", getOneUser);
 userRouter.put("/:email", updateUserIsBlock);
 userRouter.post("/verifyemail", verifyUserEmail);
+userRouter.get("/getcurrentuser", getCurrentUser);
 
 export default userRouter;
