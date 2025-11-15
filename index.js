@@ -10,11 +10,23 @@ import roomRouter from "./routes/roomsRouter.js";
 import bookingrouter from "./routes/bookingRouter.js";
 import cors from "cors";
 import StudentRouter from "./routes/studentRouter.js";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
+
+// ✅ Global Rate Limiter
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10, // 100 requests per minute per IP
+  message: "⚠️ Too many requests, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter); // 👈 apply before routes
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
@@ -66,5 +78,6 @@ app.use("/api/student", StudentRouter);
 
 // Start the server
 app.listen(5000, () => {
+  console.log("run this");
   console.log(`Server is running on port ${5000}`);
 });
