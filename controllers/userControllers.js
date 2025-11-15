@@ -57,7 +57,6 @@ export async function postUser(req, res) {
 }
 
 export async function getUser(req, res) {
-  console.log("running");
   try {
     if (checkIsAdmin(req)) {
       // Get page number and page size from query parameters, set default values
