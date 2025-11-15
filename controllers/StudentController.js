@@ -1,3 +1,4 @@
+
 import Student from "../models/studentData.js";
 
 export async function createstudent(req, res) {
@@ -33,3 +34,6 @@ export async function getStudent(req, res) {
     res.status(500).json({ message: "Server Error" });
   }
 }
+
+
+
